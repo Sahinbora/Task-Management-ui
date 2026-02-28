@@ -62,22 +62,23 @@
 ];
 
 
-import TaskService from '@/service/TaskService';
+
 import { onMounted,ref } from 'vue'
 
 const tasks = ref([]);
 
-const getTasks = async () => {
+/* const getTasks = async () => {
 
     tasks.value = await TaskService.getTasks()
 
-}; 
+}; */
 
 
 onMounted(async () => {
 
-await getTasks();
-    console.log('gelen sonuc: ' + tasks.value.length);
+await fetch('/api/tasks/all')
+.then(response => response.json())
+.then(res => tasks.value = res)
 })
 </script>
 
