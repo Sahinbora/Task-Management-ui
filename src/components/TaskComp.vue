@@ -13,7 +13,7 @@
             </div>
             <div>
                 <label for="">Due Date</label>
-                <a-input type="text" v-model:value="task.dueDate"/>
+                <date-picker type="text"  v-model:value="task.dueDate"/>
             </div>
             <div>
                 <label for="">Status</label>
@@ -21,7 +21,7 @@
             </div>
             <div>
                 <label for="">User</label>
-                <a-input type="text" v-model:value="task.user"/>
+                <a-input type="text" v-model:value="task.userId"/>
             </div>
         </a-modal>
     </div>
@@ -74,6 +74,7 @@
 
 
 import TaskService from '@/service/TaskService';
+import { DatePicker } from 'ant-design-vue';
 import { onMounted,ref } from 'vue'
 
 const tasks = ref([]);
