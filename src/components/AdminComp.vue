@@ -1,5 +1,5 @@
 <template>
-    <a-modal v-model:open="open" title="Add User Task" @ok="addUserTask">
+    <a-modal v-model:open="open" title="Add Task To User" @ok="addUserTask">
         <div>
             <label for="">Title</label>
             <a-input type="text" v-model:value="task.title"/>
