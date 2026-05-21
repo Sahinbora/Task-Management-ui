@@ -25,7 +25,7 @@ class TaskService {
                 dueDate: taskData.dueDate,
                 status: taskData.status,
                 userId: taskData.userId
-        })
+            })
         
         })
         .then(response => response.json())

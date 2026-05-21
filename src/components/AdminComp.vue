@@ -18,8 +18,6 @@
                 ref="select"
                 v-model:value="task.status"
                 style="width: 200px"
-                @focus="focus"
-                @change="handleChange"
             > 
                 <a-select-option value="READY">Ready</a-select-option>
                 <a-select-option value="PENDING">Pending</a-select-option>
@@ -35,15 +33,15 @@
     </a-modal>
    <a-table :columns="columns" :data-source="users">
     <template #bodyCell="{ column, record }">
-      <template v-if="column.key === 'name'">
-          {{ record.name }}
-      </template>
-      
-      <template v-else-if="column.key === 'action'">
-        <span>
-          <a-button type="primary" @click="showModal" style="float: center;">+</a-button>
-        </span>
-      </template>
+        <template v-if="column.key === 'name'">
+            {{ record.name }}
+        </template>
+        
+        <template v-else-if="column.key === 'action'">
+                <span>
+                    <a-button type="primary" @click="showModal" style="float: center;">+</a-button>
+                </span>
+        </template>
       
     </template>
 
@@ -68,52 +66,44 @@
 
     const columns = [
     
-    {
-        title: 'Name',
-        dataIndex: 'name',
-        key: 'name',
-    },
-    {
-        title: 'Action',
-        key: 'action',
-    },
+        {
+            title: 'Name',
+            dataIndex: 'name',
+            key: 'name',
+        },
+        {
+            title: 'Action',
+            key: 'action',
+        }
     ];
 
     const getUsers = async () => {
+
         users.value = await AdminService.getUsers();
-    }
+    };
 
     const addUserTask = async () => {
     
         await AdminService.addUserTask(task.value);
 
         task.value = {
-        title: '',
-        description: '',
-        dueDate: '',
-        status:'',
-        userId: null
+            title: '',
+            description: '',
+            dueDate: '',
+            status:'',
+            userId: null
         }
         open.value = false;
-
-    }
+    };
 
     const showModal = async () => {
+
         open.value = true;
-    }
-
-    const focus = () => {
-        console.log('focus');
-    }
-
-    const handleChange = value => {
-        console.log(`selected ${value}`);
-    }
-
+    };
 
     onMounted(async () => {
+
         await getUsers();
         console.log('gelen sonuc: ' + users.value.length)
-    })
-
+    });
 </script>
