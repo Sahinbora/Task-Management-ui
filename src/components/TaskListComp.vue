@@ -10,10 +10,10 @@
           @search="handleTaskSearch"
           style="width: 280px"
         />
-        <a-button type="primary" @click="showModal">Add Task</a-button>
+        <a-button type="primary" @click="showAddModal">Add Task</a-button>
       </div>
 
-      <a-modal v-model:open="open" title="Add Task" @ok="addTask" :width="520">
+      <a-modal v-model:open="open" :title="isEditMode ? 'Edit Task' : 'Add Task'" @ok="handleModalOk" :width="520">
         <div class="modal-form-item">
           <h4>Title</h4>
           <a-input type="text" v-model:value="taskForm.title" placeholder="Enter task title" />
@@ -74,7 +74,10 @@
             {{ record.dueDate ? new Date(record.dueDate).toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '-' }}
           </template>
           <template v-else-if="column.key === 'action'">
-            <span>
+            <span style="display: inline-flex; gap: 8px;">
+              <a-button type="text" shape="circle" @click="showEditModal(record)">
+                <template #icon><edit-outlined /></template>
+              </a-button>
               <a-popconfirm title="Are you sure to delete this task?" ok-text="Yes" cancel-text="No" @confirm="deleteTaskById(record.id)">
                 <a-button type="text" danger shape="circle">
                   <template #icon><delete-outlined /></template>
@@ -91,16 +94,19 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { DatePicker, message } from 'ant-design-vue';
-import { DeleteOutlined } from '@ant-design/icons-vue';
+import { DeleteOutlined, EditOutlined } from '@ant-design/icons-vue';
 import TaskService from '@/service/TaskService';
+import dayjs from 'dayjs';
 
 const tasks = ref([]);
 const users = ref([]);
 const tableLoading = ref(false);
 const open = ref(false);
+const isEditMode = ref(false);
 const searchQuery = ref('');
 
 const taskForm = ref({
+  id: null,
   title: '',
   description: '',
   dueDate: null,
@@ -217,6 +223,14 @@ const handleUserSearch = (val) => {
   }, 300);
 };
 
+const handleModalOk = async () => {
+  if (isEditMode.value) {
+    await updateTask();
+  } else {
+    await addTask();
+  }
+};
+
 const addTask = async () => {
   if (!taskForm.value.title || taskForm.value.title.trim() === '') {
     message.warning('Please enter a task title');
@@ -229,6 +243,7 @@ const addTask = async () => {
     
     // Reset form
     taskForm.value = {
+      id: null,
       title: '',
       description: '',
       dueDate: null,
@@ -241,6 +256,34 @@ const addTask = async () => {
   } catch (error) {
     console.error('Error adding task:', error);
     message.error('Something went wrong while adding task');
+  }
+};
+
+const updateTask = async () => {
+  if (!taskForm.value.title || taskForm.value.title.trim() === '') {
+    message.warning('Please enter a task title');
+    return;
+  }
+
+  try {
+    await TaskService.updateTask(taskForm.value);
+    message.success('Task Updated Successfully');
+    
+    // Reset form
+    taskForm.value = {
+      id: null,
+      title: '',
+      description: '',
+      dueDate: null,
+      status: 'READY',
+      userId: null
+    };
+
+    open.value = false;
+    await getTasks();
+  } catch (error) {
+    console.error('Error updating task:', error);
+    message.error('Something went wrong while updating task');
   }
 };
 
@@ -266,7 +309,29 @@ const getStatusColor = (status) => {
   return colors[status] || 'default';
 };
 
-const showModal = () => {
+const showAddModal = () => {
+  isEditMode.value = false;
+  taskForm.value = {
+    id: null,
+    title: '',
+    description: '',
+    dueDate: null,
+    status: 'READY',
+    userId: null
+  };
+  open.value = true;
+};
+
+const showEditModal = (record) => {
+  isEditMode.value = true;
+  taskForm.value = {
+    id: record.id,
+    title: record.title,
+    description: record.description,
+    dueDate: record.dueDate ? dayjs(record.dueDate) : null,
+    status: record.status,
+    userId: record.userId
+  };
   open.value = true;
 };
 

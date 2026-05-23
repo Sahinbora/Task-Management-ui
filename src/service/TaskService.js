@@ -39,8 +39,24 @@ class TaskService {
         }
         })
     }
-        
 
+    async updateTask(taskData) {
+        await fetch('/api/tasks/update', {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json' 
+            },
+            body: JSON.stringify({
+                id: taskData.id,
+                title: taskData.title,
+                description: taskData.description,
+                dueDate: taskData.dueDate,
+                status: taskData.status,
+                userId: taskData.userId
+            })
+        })
+        .then(response => response.json())
+    }
 }
 
 export default new TaskService();
